@@ -1,13 +1,13 @@
-# Registers players and records their moves
 class Player
-  attr_accessor :moves
+  attr_accessor :name, :mark, :wins
 
-  def initialize(name)
+  def initialize(name, mark)
     @name = name
-    @moves = []
+    @mark = mark
+    @wins = 0
   end
 
-  def update_moves(move)
-    @moves << move
+  def update_wins
+    @wins += 1
   end
 end
