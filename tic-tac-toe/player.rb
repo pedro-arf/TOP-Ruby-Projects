@@ -10,4 +10,8 @@ class Player
   def update_wins
     @wins += 1
   end
+
+  def display_wins
+    puts "#{@name}'s wins: #{@wins}\n"
+  end
 end
