@@ -1,9 +1,11 @@
 require_relative 'computer'
 require_relative 'player'
 require_relative 'board'
+require_relative 'instructions'
 
 module Mastermind
   def self.init_game
+    puts instructions
     puts 'Enter your name!'
     name = gets.chomp
     player = Player.new(name)
@@ -42,12 +44,13 @@ module Mastermind
   end
 
   def self.check_winner(player, computer)
+    puts "\n#{player.name} #{player.points} - #{computer.points} AI\n\n"
     if player.points > computer.points
-      puts "Congratulations #{player.name}!!! You have won the game!!\n"
+      puts "CONGRATS #{player.name}!! You have WON the game!!"
     elsif player.points == computer.points
-      puts "The game has ended with a draw!!\n"
+      puts 'The game has ended with a DRAW!!'
     else
-      puts "You've lost, #{player.name}! Better luck next time!!\n"
+      puts "YOU'VE LOST, #{player.name}!! Better luck next time!!"
     end
   end
 

@@ -18,12 +18,13 @@ class Board
   private
 
   def computer_codemaker
-    puts "\nThe computer is the Code Maker!\n"
+    puts "\nTHE AI IS THE CODE MAKER!\n"
 
-    code = Array.new(CODE_LENGTH) { rand(1..6) }
+    code = @possible_solutions.sample
 
-    TURNS.times do
-      puts "\n#{@player.name}, make your guess!\n"
+    TURNS.times do |turn|
+      puts "\nTurn: #{turn}"
+      puts "#{@player.name}, enter your guess:\n"
 
       new_guess = enter_code
 
@@ -31,26 +32,11 @@ class Board
 
       display_board
 
-      @guess.each_with_index do |number, index|
-        if code[index] == number
-          @guess[index] = CODE_PEGS[0]
-        elsif code.include?(number)
-          @guess[index] = CODE_PEGS[1]
-        end
-      end
+      find_player_matches(code)
 
       display_board
 
-      if @guess.all?('M')
-        puts "\nCongrats #{@player.name}!! You have guessed the code!\n\n"
-        break
-      end
-    end
-
-    unless @guess.all?('M')
-      @computer.update_points
-      puts "\nYou have not guessed the code! The computer has won this round!\n" \
-           "The code was: #{code.join}\n"
+      break if player_win(turn, code)
     end
   end
 
@@ -59,7 +45,7 @@ class Board
     exact_match = {}
     wrong_numbers = []
 
-    puts "\nThe computer is the Code Breaker!\n"
+    puts "\nTHE AI IS THE CODE BREAKER!\n"
     puts "\n#{@player.name}, enter a code:\n"
 
     code = enter_code.digits.reverse
@@ -70,30 +56,47 @@ class Board
   end
 
   def ai_codebreaker_loop(computer_guess, code, exact_match, partial_match, wrong_numbers)
-    TURNS.times do
-      puts "\nThe computer has made a guess!\n"
+    TURNS.times do |turn|
+      puts "\nTurn: #{turn}"
+      puts "The AI has made a guess!\n"
 
       @guess = computer_guess
 
       display_board
 
-      find_matches(computer_guess, code, exact_match, partial_match, wrong_numbers)
+      find_computer_matches(computer_guess, code, exact_match, partial_match, wrong_numbers)
 
       display_board
 
-      if @guess.all?('M')
-        puts "\nThe computer has guessed the code!!\n\n"
-        return true
-      end
+      break unless computer_win(turn)
+
       computer_guess = update_guess(wrong_numbers, exact_match)
     end
-
-    @player.update_points
-    puts "\nCongrats #{@player.name}, you've won this round!! The computer has not guessed the code!\n" \
-         "The code was: #{code.join}\n"
   end
 
-  def find_matches(computer_guess, code, exact_match, partial_match, wrong_numbers)
+  def player_win(turn, code)
+    if @guess.all?('M') && turn < 11
+      puts "\nCongrats #{@player.name}!! You have guessed the code!\n\n"
+      return true
+    elsif turn == 11
+      @computer.update_points
+      puts "\nYou have not guessed the code! The AI has won this round!\n The code was: #{code.join}\n"
+    end
+    false
+  end
+
+  def computer_win(turn)
+    if @guess.all?('M') && turn < 11
+      puts "\nThe computer has guessed the code!!\n\n"
+      return false
+    elsif turn == 11
+      @player.update_points
+      puts "\nCongrats #{@player.name}, you've won this round!! The AI has not guessed the code!\n"
+    end
+    true
+  end
+
+  def find_computer_matches(computer_guess, code, exact_match, partial_match, wrong_numbers)
     computer_guess.each_with_index do |number, index|
       if code[index] == number
         @guess[index] = CODE_PEGS[0]
@@ -103,6 +106,16 @@ class Board
         partial_match[index] = number
       else
         wrong_numbers << number end
+    end
+  end
+
+  def find_player_matches(code)
+    @guess.each_with_index do |number, index|
+      if code[index] == number
+        @guess[index] = CODE_PEGS[0]
+      elsif code.include?(number)
+        @guess[index] = CODE_PEGS[1]
+      end
     end
   end
 
